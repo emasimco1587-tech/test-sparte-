@@ -1,5 +1,5 @@
 // Service worker — cache l'app et les données pour un usage hors-ligne
-const CACHE = 'planning-v18';
+const CACHE = 'planning-v20';
 const ASSETS = [
   '.',
   'index.html',
@@ -24,8 +24,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
-  // Les données : réseau d'abord (pour récupérer une mise à jour), cache en secours.
-  if (url.pathname.endsWith('planning-data.json')) {
+  // Les données + la config d'équipe : réseau d'abord (pour récupérer une mise à jour), cache en secours.
+  if (url.pathname.endsWith('planning-data.json') || url.pathname.endsWith('team-config.json')) {
     e.respondWith(
       fetch(e.request).then(res => {
         const copy = res.clone();
