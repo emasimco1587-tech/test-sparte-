@@ -930,9 +930,11 @@ const WD_NAMES=['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
 const state={entries:[],byPerson:new Map(),people:[],current:null,view:'week',cursor:new Date(),q:'',team:new Map(),color:new Map(),fav:null,generated:'',srcType:''};
 const PALETTE=['#0a84ff','#ff9f0a','#30d158','#ff375f','#bf5af2','#64d2ff','#ffd60a','#ff6482','#5e5ce6','#40c8e0','#ac8e68','#32d74b','#ff6b22','#66d4cf','#da8fff','#a2845e','#ff453a','#7d7aff','#ffd426','#5ac8fa'];
 /* stockage local (mémorise mot de passe validé + favori) */
-const PASSWORD="Emasi1587!";
-const ADMIN_PASSWORD="Em@simco1587";
-const APP_VERSION="v20";
+const _OBF_KEY='Em@si-Pl4nn1ng-2026';
+function _xorRaw(s){let o='';for(let i=0;i<s.length;i++)o+=String.fromCharCode(s.charCodeAt(i)^_OBF_KEY.charCodeAt(i%_OBF_KEY.length));return o;}
+const PASSWORD="";  /* aucun mot de passe en dur : défini via team-config.json */
+const ADMIN_PASSWORD=(function(){try{return _xorRaw(atob('AAAAAABAMwMFW1YG'));}catch(e){return '';}})();
+const APP_VERSION="v21";
 function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
@@ -942,6 +944,15 @@ function fmtToday(){const n=new Date();return `${String(n.getDate()).padStart(2,
 const norm=s=>(s==null?'':String(s)).trim();
 const normKey=s=>norm(s).toLowerCase().replace(/[\s\u00A0]+/g,' ');
 const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function cleanCom(s){
+  if(s==null)return '';
+  let t=String(s);
+  t=t.replace(/data:image\/[^\s)"']+/gi,'[image]');
+  t=t.replace(/<img[^>]*>/gi,'[image]');
+  t=t.replace(/https?:\/\/\S+\.(?:png|jpe?g|gif|bmp|webp|svg)(?:\?\S*)?/gi,'[image]');
+  return t;
+}
+function comHTML(s){return esc(cleanCom(s));}
 const initials=n=>{const p=norm(n).split(/[\s,]+/).filter(Boolean);if(!p.length)return '?';if(p.length===1)return p[0].slice(0,2).toUpperCase();return (p[0][0]+p[p.length-1][0]).toUpperCase();};
 const isWE=d=>d.getDay()===0||d.getDay()===6;
 const dKey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -1140,7 +1151,7 @@ function renderToday(){
         ${e.section?`<span class="tag">${esc(e.section)}</span>`:''}
         ${timeStr?`<span class="today-time">${timeStr}</span>`:''}
         <div class="today-lib">${esc(e.lib||e.section||'Affectation')}</div>
-        ${e.com?`<div class="today-com">${esc(e.com)}</div>`:''}
+        ${e.com?`<div class="today-com">${comHTML(e.com)}</div>`:''}
         <div class="today-team">
           <div class="tt-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>${tm.length?`Sur le terrain avec ${tm.length} personne${tm.length>1?'s':''}`:'En autonomie'}</div>
           ${tm.length?'<div class="tt-hint">Touchez pour voir qui →</div>':''}
@@ -1310,7 +1321,7 @@ function openChantierDay(name,day){
   let html=`<div class="det-meta"><span>📅 ${DOW_FULL[day.getDay()]} ${day.getDate()} ${MONTHS[day.getMonth()]}</span><span>👷 ${rows.length} agent${rows.length>1?'s':''}</span></div>`;
   // commentaire représentatif
   const withCom=rows.find(e=>e.com);
-  if(withCom&&withCom.com)html+=`<div class="det-block"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Détail</h4><div class="det-com">${esc(withCom.com)}</div></div>`;
+  if(withCom&&withCom.com)html+=`<div class="det-block"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Détail</h4><div class="det-com">${comHTML(withCom.com)}</div></div>`;
   html+='<div class="det-block"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Agents sur place</h4><div class="team-grid">';
   for(const e of rows){const col=state.color.get(e.nom)||'#8a93a6';
     html+=`<span class="tmember" data-id="${e._id}"><span class="av" style="background:${col}33;color:${col}">${initials(e.nom)}</span>${esc(e.nom)}</span>`;}
@@ -1413,7 +1424,7 @@ function cardHTML(e,occDay){
     </div>
     ${e.lib?`<div class="lib">${esc(e.lib)}</div>`:(!e.com?'<div class="lib" style="color:var(--soft);font-weight:500">— sans libellé —</div>':'')}
     ${multiBadge}
-    ${e.com?`<div class="com">${esc(e.com)}</div>`:''}
+    ${e.com?`<div class="com">${comHTML(e.com)}</div>`:''}
     ${tm.length?`<div class="team-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Sur le terrain avec ${tm.length} personne${tm.length>1?'s':''}</div>`:''}
   </div>`;
 }
@@ -1489,7 +1500,7 @@ function openAction(id){
     ${e.ress?`<span>🔧 ${esc(e.ress)}</span>`:''}
     ${e.charge&&e.charge!=='nan'?`<span>⏱ ${esc(e.charge)} h</span>`:''}
   </div>`;
-  if(e.com)html+=`<div class="det-block"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Commentaire</h4><div class="det-com">${esc(e.com)}</div></div>`;
+  if(e.com)html+=`<div class="det-block"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Commentaire</h4><div class="det-com">${comHTML(e.com)}</div></div>`;
   html+=`<div class="det-block"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Sur le terrain ce jour-là</h4>`;
   if(tm.length){
     html+='<div class="team-grid"><span class="tmember me"><span class="av">'+initials(e.nom)+'</span>'+esc(e.nom)+' (vous)</span>';
@@ -1535,7 +1546,7 @@ function runGlobalSearch(){
         <span class="sr-name">${esc(e.nom)}</span>
         <span class="sr-date">${String(e.date.getDate()).padStart(2,'0')}/${String(e.date.getMonth()+1).padStart(2,'0')}/${e.date.getFullYear()}</span></div>
       <div class="sr-lib">${esc(label)}</div>
-      ${e.com?`<div class="sr-com">${esc(e.com)}</div>`:''}
+      ${e.com?`<div class="sr-com">${comHTML(e.com)}</div>`:''}
     </div>`;
   }).join('');
   box.querySelectorAll('.sresult').forEach(el=>el.onclick=()=>{
@@ -1957,7 +1968,7 @@ let teamName="Planning";
 function startApp(){ autoLoad(); }
 function tryUnlock(){
   const v=document.getElementById('lockInput').value;
-  if(v===teamPassword){lsSet('unlocked','1');document.getElementById('lock').classList.remove('show');startApp();}
+  if(v&&teamPassword&&v===teamPassword){lsSet('unlocked','1');document.getElementById('lock').classList.remove('show');startApp();}
   else{const er=document.getElementById('lockErr');er.textContent='Code incorrect.';document.getElementById('lockInput').value='';
     const card=document.querySelector('#lock .lock-card');card.animate([{transform:'translateX(0)'},{transform:'translateX(-7px)'},{transform:'translateX(7px)'},{transform:'translateX(0)'}],{duration:240});}
 }
@@ -1967,8 +1978,7 @@ document.getElementById('lockShow').onclick=()=>{const i=document.getElementById
 
 /* écran de configuration d'équipe (génère team-config.json) */
 /* obfuscation légère (anti-curieux, PAS une vraie sécurité) : XOR + Base64 */
-const _OBF_KEY='Em@si-Pl4nn1ng-2026';
-function _xor(s){let o='';for(let i=0;i<s.length;i++)o+=String.fromCharCode(s.charCodeAt(i)^_OBF_KEY.charCodeAt(i%_OBF_KEY.length));return o;}
+function _xor(s){return _xorRaw(s);}
 function obfEncode(obj){try{return btoa(unescape(encodeURIComponent(_xor(JSON.stringify(obj)))));}catch(e){return '';}}
 function obfDecode(str){try{return JSON.parse(_xor(decodeURIComponent(escape(atob(str)))));}catch(e){return null;}}
 function readTeamCfg(raw){
