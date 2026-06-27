@@ -468,6 +468,12 @@ html[data-theme="light"] #updateToast{background:rgba(255,255,255,.9)}
 .fb-help summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--blue-2);padding:8px 0}
 .fb-help .set-steps{margin-top:6px}
 .fb-help .mono{background:var(--glass-2);padding:1px 5px;border-radius:5px}
+.fb-proc{padding:4px 2px}
+.fb-step-h{font-weight:800;font-size:13px;color:var(--ink);margin:14px 0 4px;padding-top:8px;border-top:1px solid var(--line)}
+.fb-step-h:first-child{border-top:none;padding-top:0;margin-top:4px}
+.fb-code{background:#0a0e16;color:#8fd0ff;border:1px solid var(--line-2);border-radius:10px;padding:11px 13px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.5;white-space:pre;overflow-x:auto;margin:8px 0}
+html[data-theme="light"] .fb-code{background:#0b1426;color:#bfe0ff}
+.set-steps li{margin-bottom:5px;line-height:1.45}
 html[data-theme="light"] #vuePicker,html[data-theme="light"] #admin{background:rgba(238,242,248,.85)}
 html[data-theme="light"] .vue-item.on,html[data-theme="light"] .notif-opt{color:var(--ink)}
 @media(min-width:901px){.vue-list{max-width:560px;margin:0 auto;width:100%}}
@@ -792,6 +798,7 @@ html[data-theme="light"] .pcount{background:rgba(20,40,80,.10);color:#566173}
       </div>
       <p style="text-align:center;color:var(--faint);font-size:11px;margin-top:2px" id="appVersion">version —</p>
       <button class="btn btn-ink" id="setAdmin" style="justify-content:center;padding:13px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Espace administrateur</button>
+      <button class="btn btn-ink" id="setLock" style="justify-content:center;padding:13px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Verrouiller l'application</button>
       <button class="btn btn-blue" id="setClose" style="justify-content:center;padding:13px">Retour au planning</button>
     </div>
   </div>
@@ -822,15 +829,55 @@ html[data-theme="light"] .pcount{background:rgba(20,40,80,.10);color:#566173}
         <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Connexion Firebase</h3>
         <p>État : <b id="fbStatus">—</b></p>
         <details class="fb-help">
-          <summary>Procédure pour obtenir la configuration</summary>
-          <ol class="set-steps">
-            <li>Allez sur <span class="mono">console.firebase.google.com</span> et connectez-vous (compte Google).</li>
-            <li>Créez un projet (ex. <i>sparte-emasi</i>), sans Google Analytics.</li>
-            <li>Menu <b>Build → Realtime Database</b> → <b>Créer une base</b> → emplacement <b>Belgium (europe-west1)</b> → mode test.</li>
-            <li>Roue dentée → <b>Paramètres du projet</b> → section <b>Vos applications</b> → icône <b>&lt;/&gt;</b> (Web).</li>
-            <li>Copiez les valeurs du bloc <span class="mono">firebaseConfig</span> dans les champs ci-dessous.</li>
-            <li>Dans Realtime Database → onglet <b>Règles</b>, mettez <span class="mono">.read</span> et <span class="mono">.write</span> à <span class="mono">true</span>, puis <b>Publier</b>.</li>
-          </ol>
+          <summary>📖 Procédure complète pas à pas (à lire si vous débutez)</summary>
+          <div class="fb-proc">
+            <p class="fb-step-h">A. Créer le compte et le projet</p>
+            <ol class="set-steps">
+              <li>Ouvrez un navigateur et allez sur le site <span class="mono">console.firebase.google.com</span></li>
+              <li>Connectez-vous avec une <b>adresse Google</b> (Gmail). Si vous n'en avez pas, créez-en une d'abord.</li>
+              <li>Cliquez sur le bouton <b>« Créer un projet »</b> (ou « Add project »).</li>
+              <li>Tapez un nom, par exemple <b>sparte-emasi</b>, puis cliquez <b>Continuer</b>.</li>
+              <li>Sur l'écran « Google Analytics », <b>désactivez</b> l'interrupteur (inutile ici), puis <b>Continuer</b> / <b>Créer le projet</b>.</li>
+              <li>Patientez ~30 secondes, puis cliquez <b>Continuer</b>. Vous arrivez sur le tableau de bord du projet.</li>
+            </ol>
+
+            <p class="fb-step-h">B. Créer la base de données</p>
+            <ol class="set-steps">
+              <li>Dans le menu de <b>gauche</b>, cliquez sur <b>« Création »</b> (ou « Build ») pour le dérouler.</li>
+              <li>Cliquez sur <b>« Realtime Database »</b> (Base de données en temps réel). ⚠️ Pas « Firestore ».</li>
+              <li>Cliquez sur le bouton <b>« Créer une base de données »</b>.</li>
+              <li>Pour l'emplacement, choisissez <b>« Belgium (europe-west1) »</b>, puis <b>Suivant</b>.</li>
+              <li>Choisissez <b>« Démarrer en mode test »</b>, puis cliquez <b>Activer</b>.</li>
+              <li>Une page avec un tableau vide s'affiche : la base est créée. ✅</li>
+            </ol>
+
+            <p class="fb-step-h">C. Autoriser la lecture et l'écriture (Règles)</p>
+            <ol class="set-steps">
+              <li>En haut de cette même page, cliquez sur l'onglet <b>« Règles »</b> (Rules).</li>
+              <li>Effacez tout le texte présent et collez exactement ceci :</li>
+            </ol>
+            <pre class="fb-code">{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}</pre>
+            <ol class="set-steps" start="3">
+              <li>Cliquez sur <b>« Publier »</b> (Publish). Confirmez si demandé.</li>
+            </ol>
+
+            <p class="fb-step-h">D. Récupérer la configuration</p>
+            <ol class="set-steps">
+              <li>Tout en haut à gauche, cliquez sur la <b>roue dentée ⚙️</b> → <b>« Paramètres du projet »</b>.</li>
+              <li>Descendez jusqu'à la section <b>« Vos applications »</b>.</li>
+              <li>Cliquez sur l'icône <b>&lt;/&gt;</b> (le symbole « Web »).</li>
+              <li>Donnez un surnom (ex. <b>EMASI</b>), <b>ne cochez pas</b> « Hosting », puis <b>Enregistrer l'application</b>.</li>
+              <li>Un bloc de code apparaît avec <span class="mono">const firebaseConfig = {…}</span>.</li>
+              <li>Recopiez chaque valeur (entre les guillemets) dans les champs ci-dessous. Exemple : la ligne <span class="mono">apiKey: "AIza…"</span> → mettez <span class="mono">AIza…</span> dans le champ « apiKey ».</li>
+              <li>Cliquez enfin sur <b>« Enregistrer &amp; connecter »</b> en bas. L'app se recharge et se connecte.</li>
+            </ol>
+            <p class="notif-note">💡 Astuce : laissez l'onglet Firebase ouvert pendant que vous recopiez les 7 valeurs. Vous pouvez copier-coller chaque valeur une par une.</p>
+          </div>
         </details>
         <label class="ts-label">apiKey</label>
         <input id="fbApiKey" class="ts-input" type="text" placeholder="AIza..." autocomplete="off">
@@ -978,7 +1025,7 @@ const WD_NAMES=['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
 
 const state={entries:[],byPerson:new Map(),people:[],current:null,view:'week',cursor:new Date(),q:'',team:new Map(),color:new Map(),fav:null,generated:'',srcType:''};
 const PALETTE=['#0a84ff','#ff9f0a','#30d158','#ff375f','#bf5af2','#64d2ff','#ffd60a','#ff6482','#5e5ce6','#40c8e0','#ac8e68','#32d74b','#ff6b22','#66d4cf','#da8fff','#a2845e','#ff453a','#7d7aff','#ffd426','#5ac8fa'];
-const APP_VERSION="v24";
+const APP_VERSION="v25";
 function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
@@ -1991,6 +2038,7 @@ function fillFbFields(){
 function closeAdmin(){document.getElementById('admin').classList.remove('show');}
 function adminDataInfoFill(){const el=document.getElementById('adminDataInfo');if(el)el.innerHTML=state.generated?`Dernière mise à jour : <b>${esc(state.generated)}</b> ${state.srcType?'('+state.srcType+')':''} · ${state.entries.length} affectations`:'Aucune donnée chargée.';}
 document.getElementById('setAdmin').onclick=requestAdmin;
+document.getElementById('setLock').onclick=()=>{lsDel('unlocked');location.reload();};
 document.getElementById('adminClose').onclick=()=>{closeAdmin();goPlanning();};
 document.getElementById('adminBack').onclick=()=>{closeAdmin();showSettings();};
 document.getElementById('adminQuit').onclick=()=>{closeAdmin();goPlanning();};
@@ -2109,30 +2157,26 @@ function fbGet(path){ return fbReady ? fbDB.ref(path).get().then(s=>s.exists()?s
 function fbSet(path,val){ return fbReady ? fbDB.ref(path).set(val) : Promise.reject('Firebase non connecté'); }
 
 function bootWithTeam(){
-  if(!fbReady){
-    // Firebase non configuré : on retombe sur les valeurs par défaut (et le JSON local pour les données)
-    teamPassword=DEFAULT_PASSWORD; adminPassword=DEFAULT_ADMIN_PASSWORD; teamName='Planning';
-    afterTeamLoaded(true); return;
+  // Afficher le verrou TOUT DE SUITE (sauf si déjà déverrouillé sur cet appareil),
+  // puis résoudre les mots de passe en arrière-plan.
+  teamPassword=DEFAULT_PASSWORD; adminPassword=DEFAULT_ADMIN_PASSWORD; teamName='Planning';
+  if(lsGet('unlocked')==='1'){ startApp(); }
+  else { showLockNow(); }
+  if(fbReady){
+    fbGet('config').then(cfg=>{
+      if(cfg && (cfg.openPass||cfg.adminPass)){
+        teamPassword=cfg.openPass||DEFAULT_PASSWORD;
+        adminPassword=cfg.adminPass||DEFAULT_ADMIN_PASSWORD;
+        teamName=cfg.teamName||'Planning';
+      }else{
+        fbSet('config',{openPass:DEFAULT_PASSWORD,adminPass:DEFAULT_ADMIN_PASSWORD,teamName:'Planning'}).catch(()=>{});
+      }
+      document.getElementById('lockTeam').textContent=teamName||'Planning';
+    }).catch(()=>{});
   }
-  fbGet('config').then(cfg=>{
-    if(cfg && (cfg.openPass||cfg.adminPass)){
-      teamPassword=cfg.openPass||DEFAULT_PASSWORD;
-      adminPassword=cfg.adminPass||DEFAULT_ADMIN_PASSWORD;
-      teamName=cfg.teamName||'Planning';
-    }else{
-      // rien dans Firebase : on initialise avec les valeurs par défaut
-      teamPassword=DEFAULT_PASSWORD; adminPassword=DEFAULT_ADMIN_PASSWORD; teamName='Planning';
-      fbSet('config',{openPass:DEFAULT_PASSWORD,adminPass:DEFAULT_ADMIN_PASSWORD,teamName:'Planning'}).catch(()=>{});
-    }
-    afterTeamLoaded(true);
-  }).catch(()=>{
-    teamPassword=DEFAULT_PASSWORD; adminPassword=DEFAULT_ADMIN_PASSWORD;
-    afterTeamLoaded(true);
-  });
 }
-function afterTeamLoaded(){
+function showLockNow(){
   document.getElementById('lockTeam').textContent=teamName||'Planning';
-  if(lsGet('unlocked')==='1'){startApp();return;}
   document.getElementById('lock').classList.add('show');
   setTimeout(()=>{if(window.matchMedia('(min-width:901px)').matches)document.getElementById('lockInput').focus();},80);
 }
