@@ -464,6 +464,10 @@ html[data-theme="light"] #updateToast{background:rgba(255,255,255,.9)}
 .notif-opt{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;background:var(--glass-2);border:1px solid var(--line);font-size:14px;font-weight:600;cursor:pointer}
 .notif-opt input{width:20px;height:20px;accent-color:var(--blue)}
 .notif-note{font-size:11.5px;color:var(--faint);margin-top:10px;line-height:1.5}
+.fb-help{margin:6px 0 4px}
+.fb-help summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--blue-2);padding:8px 0}
+.fb-help .set-steps{margin-top:6px}
+.fb-help .mono{background:var(--glass-2);padding:1px 5px;border-radius:5px}
 html[data-theme="light"] #vuePicker,html[data-theme="light"] #admin{background:rgba(238,242,248,.85)}
 html[data-theme="light"] .vue-item.on,html[data-theme="light"] .notif-opt{color:var(--ink)}
 @media(min-width:901px){.vue-list{max-width:560px;margin:0 auto;width:100%}}
@@ -782,21 +786,6 @@ html[data-theme="light"] .pcount{background:rgba(20,40,80,.10);color:#566173}
         <button class="btn btn-ink" id="setFav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Choisir / changer mon nom</button>
       </div>
       <div class="set-card">
-        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Mettre à jour les données</h3>
-        <p>Chargez un nouvel export <b>Excel (.xlsx)</b> ou un fichier <b>.json</b>. L'affichage se met à jour immédiatement sur cet appareil.</p>
-        <button class="btn btn-ink" id="setUpdate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0-12 4 4m-4-4-4 4M5 21h14"/></svg>Choisir un fichier</button>
-      </div>
-      <div class="set-card">
-        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Publier en ligne</h3>
-        <p>Pour mettre à jour le site et l'appli de tout le monde :</p>
-        <ol class="set-steps">
-          <li>Chargez d'abord le nouvel Excel ci-dessus.</li>
-          <li>Touchez « Exporter » pour télécharger <span class="mono">planning-data.json</span>.</li>
-          <li>Déposez ce fichier sur GitHub (il remplace l'ancien).</li>
-        </ol>
-        <button class="btn btn-amber" id="setExport" style="margin-top:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Exporter pour le web</button>
-      </div>
-      <div class="set-card">
         <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 6.7 3L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9 9 0 0 1-6.7-3L3 16"/><path d="M3 21v-5h5"/></svg>Données & actualisation</h3>
         <p id="dataInfo">Dernière mise à jour : —</p>
         <button class="btn btn-blue" id="setRefresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Rafraîchir (vider le cache)</button>
@@ -829,6 +818,39 @@ html[data-theme="light"] .pcount{background:rgba(20,40,80,.10);color:#566173}
     </div>
     <div class="sheet-head"><h2>Administrateur</h2><p>Couleurs, données, notifications et configuration.</p></div>
     <div class="set-list" id="adminList">
+      <div class="set-card">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Connexion Firebase</h3>
+        <p>État : <b id="fbStatus">—</b></p>
+        <details class="fb-help">
+          <summary>Procédure pour obtenir la configuration</summary>
+          <ol class="set-steps">
+            <li>Allez sur <span class="mono">console.firebase.google.com</span> et connectez-vous (compte Google).</li>
+            <li>Créez un projet (ex. <i>sparte-emasi</i>), sans Google Analytics.</li>
+            <li>Menu <b>Build → Realtime Database</b> → <b>Créer une base</b> → emplacement <b>Belgium (europe-west1)</b> → mode test.</li>
+            <li>Roue dentée → <b>Paramètres du projet</b> → section <b>Vos applications</b> → icône <b>&lt;/&gt;</b> (Web).</li>
+            <li>Copiez les valeurs du bloc <span class="mono">firebaseConfig</span> dans les champs ci-dessous.</li>
+            <li>Dans Realtime Database → onglet <b>Règles</b>, mettez <span class="mono">.read</span> et <span class="mono">.write</span> à <span class="mono">true</span>, puis <b>Publier</b>.</li>
+          </ol>
+        </details>
+        <label class="ts-label">apiKey</label>
+        <input id="fbApiKey" class="ts-input" type="text" placeholder="AIza..." autocomplete="off">
+        <label class="ts-label">authDomain</label>
+        <input id="fbAuthDomain" class="ts-input" type="text" placeholder="projet.firebaseapp.com" autocomplete="off">
+        <label class="ts-label">databaseURL</label>
+        <input id="fbDbUrl" class="ts-input" type="text" placeholder="https://projet-default-rtdb.europe-west1.firebasedatabase.app" autocomplete="off">
+        <label class="ts-label">projectId</label>
+        <input id="fbProjectId" class="ts-input" type="text" placeholder="projet" autocomplete="off">
+        <label class="ts-label">storageBucket</label>
+        <input id="fbStorage" class="ts-input" type="text" placeholder="projet.appspot.com" autocomplete="off">
+        <label class="ts-label">messagingSenderId</label>
+        <input id="fbSender" class="ts-input" type="text" placeholder="123456789" autocomplete="off">
+        <label class="ts-label">appId</label>
+        <input id="fbAppId" class="ts-input" type="text" placeholder="1:123:web:abc..." autocomplete="off">
+        <button class="btn btn-blue" id="fbSave" style="margin-top:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>Enregistrer & connecter</button>
+        <button class="btn btn-ink" id="fbTest" style="margin-top:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>Tester la connexion</button>
+        <button class="btn btn-ink" id="fbReset" style="margin-top:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>Effacer la configuration saisie</button>
+        <p class="notif-note">Les règles Firebase à coller (onglet Règles) : <span class="mono">{ "rules": { ".read": true, ".write": true } }</span></p>
+      </div>
       <div class="set-card">
         <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2a10 10 0 1 0 0 20 2 2 0 0 0 2-2 2 2 0 0 0-2-2h-1.5a2.5 2.5 0 0 1 0-5H14a6 6 0 0 0 0-12z"/></svg>Couleurs des personnes</h3>
         <p>Touchez une pastille pour changer la couleur d'un agent (utilisée en vues Équipe et Chantiers).</p>
@@ -926,16 +948,24 @@ const FIREBASE_CONFIG = {
 };
 const DEFAULT_PASSWORD="Admin123!";
 const DEFAULT_ADMIN_PASSWORD="Admin123!";
-let fbDB=null, fbReady=false;
-(function initFirebase(){
+let fbDB=null, fbReady=false, fbActiveConfig=null;
+function getActiveFbConfig(){
+  // priorité à une config saisie dans l'admin (localStorage), sinon la config par défaut du code
+  try{ const s=localStorage.getItem('fb_config'); if(s){const o=JSON.parse(s); if(o&&o.apiKey&&o.databaseURL) return o;} }catch(e){}
+  return FIREBASE_CONFIG;
+}
+function initFirebase(){
   try{
-    if(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey!=="A_REMPLACER"){
-      firebase.initializeApp(FIREBASE_CONFIG);
+    const cfg=getActiveFbConfig();
+    if(cfg && cfg.apiKey && cfg.apiKey!=="A_REMPLACER" && cfg.databaseURL){
+      if(!firebase.apps.length) firebase.initializeApp(cfg);
       fbDB=firebase.database();
-      fbReady=true;
+      fbReady=true; fbActiveConfig=cfg;
     }
   }catch(e){ console.warn('Firebase non initialise :', e); }
-})();
+}
+initFirebase();
+
 </script>
 
 <script>
@@ -948,7 +978,7 @@ const WD_NAMES=['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
 
 const state={entries:[],byPerson:new Map(),people:[],current:null,view:'week',cursor:new Date(),q:'',team:new Map(),color:new Map(),fav:null,generated:'',srcType:''};
 const PALETTE=['#0a84ff','#ff9f0a','#30d158','#ff375f','#bf5af2','#64d2ff','#ffd60a','#ff6482','#5e5ce6','#40c8e0','#ac8e68','#32d74b','#ff6b22','#66d4cf','#da8fff','#a2845e','#ff453a','#7d7aff','#ffd426','#5ac8fa'];
-const APP_VERSION="v23";
+const APP_VERSION="v24";
 function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
@@ -1923,8 +1953,6 @@ function switchView(v){
 }
 document.getElementById('vueQuit').onclick=()=>{document.getElementById('vuePicker').classList.remove('show');goPlanning();};
 /* écran Réglages */
-document.getElementById('setUpdate').onclick=()=>document.getElementById('file').click();
-document.getElementById('setExport').onclick=exportForWeb;
 document.getElementById('setClose').onclick=goPlanning;
 document.getElementById('setFav').onclick=()=>{hideSettings();showFavPicker();};
 document.getElementById('setRefresh').onclick=async()=>{
@@ -1946,13 +1974,20 @@ function requestAdmin(){
   if(code===ref){adminUnlocked=true;openAdmin();}
   else alert('Code incorrect.');
 }
-function openAdmin(){hideSettings();renderColorList();adminDataInfoFill();
+function openAdmin(){hideSettings();renderColorList();adminDataInfoFill();fillFbFields();
   const po=document.getElementById('pwOpen'),pa=document.getElementById('pwAdmin');
   if(po)po.value=teamPassword||DEFAULT_PASSWORD;
   if(pa)pa.value=adminPassword||DEFAULT_ADMIN_PASSWORD;
   const fbs=document.getElementById('adminFbState');
-  if(fbs)fbs.textContent=fbReady?'Firebase connecté : les publications sont partagées avec toute l\'équipe.':'Firebase non configuré : renseignez FIREBASE_CONFIG dans index.html pour activer le partage automatique.';
+  if(fbs)fbs.textContent=fbReady?'Firebase connecté : les publications sont partagées avec toute l\'équipe.':'Firebase non connecté : renseignez la configuration ci-dessus.';
   document.getElementById('admin').classList.add('show');}
+function fillFbFields(){
+  const cfg=getActiveFbConfig()||{};
+  const map={fbApiKey:'apiKey',fbAuthDomain:'authDomain',fbDbUrl:'databaseURL',fbProjectId:'projectId',fbStorage:'storageBucket',fbSender:'messagingSenderId',fbAppId:'appId'};
+  for(const id in map){const el=document.getElementById(id);if(el){const v=cfg[map[id]];el.value=(v&&v!=='A_REMPLACER')?v:'';}}
+  const st=document.getElementById('fbStatus');
+  if(st)st.innerHTML=fbReady?'<span style="color:#30d158">Connecté ('+esc(cfg.projectId||'')+')</span>':'<span style="color:#ff9f0a">Non connecté</span>';
+}
 function closeAdmin(){document.getElementById('admin').classList.remove('show');}
 function adminDataInfoFill(){const el=document.getElementById('adminDataInfo');if(el)el.innerHTML=state.generated?`Dernière mise à jour : <b>${esc(state.generated)}</b> ${state.srcType?'('+state.srcType+')':''} · ${state.entries.length} affectations`:'Aucune donnée chargée.';}
 document.getElementById('setAdmin').onclick=requestAdmin;
@@ -1979,6 +2014,37 @@ document.getElementById('colorReset').onclick=()=>{lsDel('colors');build(state.e
 document.getElementById('adminImport').onclick=()=>document.getElementById('file').click();
 document.getElementById('adminExport').onclick=exportForWeb;
 document.getElementById('adminPublish').onclick=publishToFirebase;
+
+/* --- configuration Firebase (saisie via l'admin) --- */
+function readFbFields(){
+  return {
+    apiKey:document.getElementById('fbApiKey').value.trim(),
+    authDomain:document.getElementById('fbAuthDomain').value.trim(),
+    databaseURL:document.getElementById('fbDbUrl').value.trim(),
+    projectId:document.getElementById('fbProjectId').value.trim(),
+    storageBucket:document.getElementById('fbStorage').value.trim(),
+    messagingSenderId:document.getElementById('fbSender').value.trim(),
+    appId:document.getElementById('fbAppId').value.trim()
+  };
+}
+document.getElementById('fbSave').onclick=()=>{
+  const cfg=readFbFields();
+  if(!cfg.apiKey||!cfg.databaseURL){alert('Au minimum « apiKey » et « databaseURL » sont nécessaires.');return;}
+  lsSet('fb_config',JSON.stringify(cfg));
+  alert('Configuration enregistrée. L\'application va se recharger pour se connecter à Firebase.');
+  location.reload();
+};
+document.getElementById('fbTest').onclick=()=>{
+  const st=document.getElementById('fbStatus');
+  if(!fbReady){st.innerHTML='<span style="color:#ff9f0a">Non connecté — enregistrez d\'abord la configuration.</span>';return;}
+  st.innerHTML='Test en cours…';
+  fbGet('config').then(()=>{st.innerHTML='<span style="color:#30d158">Connexion OK ✔</span>';})
+    .catch(err=>{st.innerHTML='<span style="color:#ff453a">Échec : vérifiez les règles (.read/.write) et l\'URL.</span>';});
+};
+document.getElementById('fbReset').onclick=()=>{
+  if(!confirm('Effacer la configuration Firebase saisie sur cet appareil ?'))return;
+  lsDel('fb_config');alert('Configuration effacée. Rechargement…');location.reload();
+};
 document.getElementById('pwSave').onclick=()=>{
   const op=document.getElementById('pwOpen').value.trim();
   const ap=document.getElementById('pwAdmin').value.trim();
