@@ -480,6 +480,31 @@ html[data-theme="light"] #vuePicker,html[data-theme="light"] #admin{background:r
 html[data-theme="light"] .vue-item.on,html[data-theme="light"] .notif-opt{color:var(--ink)}
 @media(min-width:901px){.vue-list{max-width:560px;margin:0 auto;width:100%}}
 
+/* ===== Vue Disponibilités ===== */
+.dispo-legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:4px;padding:2px}
+.dispo-legend .dl{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--soft);font-weight:600}
+.dispo-legend .dot{width:11px;height:11px;border-radius:50%}
+.dispo-body{padding:10px 12px;display:flex;flex-direction:column;gap:12px}
+.dispo-group .dg-h{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px}
+.dispo-chips{display:flex;flex-wrap:wrap;gap:7px}
+.dispo-chip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;padding:4px 11px 4px 5px;border-radius:20px;background:var(--glass-2);border:1px solid var(--line);cursor:pointer;transition:.12s}
+.dispo-chip:active{transform:scale(.96)}
+.dispo-chip.mob{border-color:rgba(255,159,10,.4)}
+.dispo-chip .av{width:24px;height:24px;font-size:10px}
+
+/* filtre de la vue équipe */
+.team-filterbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:2px 0 6px}
+.tfb-title{font-size:11.5px;color:var(--soft);font-weight:700;margin-right:2px}
+.lg-btn{cursor:pointer;transition:.12s}
+.lg-btn.off{opacity:.35;filter:grayscale(.6)}
+.lg-btn:active{transform:scale(.95)}
+.lg-clear{font-size:11.5px;font-weight:700;color:var(--blue-2);background:rgba(10,132,255,.12);border:1px solid rgba(10,132,255,.28);padding:5px 11px;border-radius:20px}
+
+/* aller à une date */
+.datejump{display:inline-flex;align-items:center;gap:4px;position:relative;color:var(--soft);cursor:pointer}
+.datejump svg{width:17px;height:17px}
+.datejump input[type="date"]{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+
 /* ===== Vue Chantiers ===== */
 .chan-wrap{display:flex;flex-direction:column;gap:16px;max-width:900px}
 .chan-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
@@ -731,11 +756,13 @@ html[data-theme="light"] .pcount{background:rgba(20,40,80,.10);color:#566173}
           <button data-v="month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 13h.01M12 13h.01M16 13h.01M8 17h.01M12 17h.01"/></svg><span>Mois</span></button>
           <button data-v="team"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg><span>Équipe</span></button>
           <button data-v="chantiers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20M4 20V10l5-3 5 3v10M14 20v-6l5-3v9M9 11h.01M9 14h.01M9 17h.01"/></svg><span>Chantiers</span></button>
+          <button data-v="dispo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Dispo</span></button>
         </div>
         <div class="nav" id="periodNav">
           <button id="prev" title="Précédent">‹</button>
           <button id="todayBtn" class="today-btn">Aujourd'hui</button>
           <span class="lbl" id="periodLbl">—</span>
+          <label class="datejump" title="Aller à une date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><input type="date" id="dateJump"></label>
           <button id="next" title="Suivant">›</button>
         </div>
       </div>
@@ -787,6 +814,13 @@ html[data-theme="light"] .pcount{background:rgba(20,40,80,.10);color:#566173}
           <button data-theme="dark" class="on">🌙 Sombre</button>
           <button data-theme="light">☀️ Clair</button>
         </div>
+        <p style="margin-top:14px">Vue affichée à l'ouverture :</p>
+        <select id="defaultView" class="ts-input" style="margin-top:6px">
+          <option value="today">Ma journée</option>
+          <option value="week">Semaine</option>
+          <option value="agenda">Agenda</option>
+          <option value="month">Mois</option>
+        </select>
       </div>
       <div class="set-card">
         <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17.3 6.2 21l1.6-6.6L2.5 9.9l6.8-.6L12 3l2.7 6.3 6.8.6-5.3 4.5 1.6 6.6z"/></svg>Mon nom (favori)</h3>
@@ -1028,7 +1062,7 @@ const WD_NAMES=['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
 
 const state={entries:[],byPerson:new Map(),people:[],current:null,view:'week',cursor:new Date(),q:'',team:new Map(),color:new Map(),fav:null,generated:'',srcType:''};
 const PALETTE=['#0a84ff','#ff9f0a','#30d158','#ff375f','#bf5af2','#64d2ff','#ffd60a','#ff6482','#5e5ce6','#40c8e0','#ac8e68','#32d74b','#ff6b22','#66d4cf','#da8fff','#a2845e','#ff453a','#7d7aff','#ffd426','#5ac8fa'];
-const APP_VERSION="v26";
+const APP_VERSION="v27";
 function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
@@ -1188,7 +1222,7 @@ function tickClock(){
 /* ---------- main render ---------- */
 function renderMain(){
   const change=document.getElementById('changeBtn');
-  if(state.view==='team'||state.view==='chantiers'){
+  if(state.view==='team'||state.view==='chantiers'||state.view==='dispo'){
     if(change)change.style.visibility='hidden';
     document.getElementById('periodNav').style.display='flex';
     const fab=document.getElementById('fabToday');if(fab)fab.dataset.hide='';
@@ -1196,10 +1230,14 @@ function renderMain(){
       document.getElementById('whoName').textContent='Équipe globale';
       document.getElementById('whoSub').textContent=`${state.people.filter(n=>!SPECIAL.test(n)).length} personnes`;
       renderTeam();
-    }else{
+    }else if(state.view==='chantiers'){
       document.getElementById('whoName').textContent='Chantiers de la semaine';
       document.getElementById('whoSub').textContent='Activité par chantier et disponibilités';
       renderChantiers();
+    }else{
+      document.getElementById('whoName').textContent='Disponibilités';
+      document.getElementById('whoSub').textContent='Agents libres ou mobilisables (temps réel)';
+      renderDispo();
     }
     return;
   }
@@ -1267,16 +1305,21 @@ function renderTeam(){
     :`${mon.getDate()} ${MONTHS[mon.getMonth()]} – ${fri.getDate()} ${MONTHS[fri.getMonth()]} ${fri.getFullYear()}`;
   document.getElementById('periodLbl').textContent='Semaine du '+lbl;
   const today=new Date();
-  // légende
   const reals=state.people.filter(n=>!SPECIAL.test(n));
-  let leg='<div class="team-legend">';
-  for(const n of reals)leg+=`<span class="lg"><span class="dot" style="background:${state.color.get(n)}"></span>${esc(n)}</span>`;
+  if(!state.teamFilter)state.teamFilter=new Set();
+  const filterActive=state.teamFilter.size>0;
+  const shown=n=>!filterActive||state.teamFilter.has(n);
+  // légende cliquable (filtre)
+  let leg='<div class="team-filterbar"><span class="tfb-title">Afficher : </span>';
+  for(const n of reals){const on=shown(n);
+    leg+=`<button class="lg lg-btn${on?'':' off'}" data-pf="${esc(n)}"><span class="dot" style="background:${state.color.get(n)}"></span>${esc(n.split(' ')[0])}</button>`;}
+  if(filterActive)leg+=`<button class="lg-clear" id="teamFilterClear">Tout afficher</button>`;
   leg+='</div>';
   let html='<div class="team-wrap">'+leg;
   let scrollId=null;
   for(let i=0;i<5;i++){
     const d=addDays(mon,i);
-    const dayEntries=entriesOnDay(state.entries,d).sort((a,b)=>{
+    const dayEntries=entriesOnDay(state.entries,d).filter(e=>shown(e.nom)).sort((a,b)=>{
       const pa=reals.indexOf(a.nom),pb=reals.indexOf(b.nom);return (pa<0?99:pa)-(pb<0?99:pb);});
     const isT=sameDay(d,today);if(isT)scrollId='team'+i;
     html+=`<div class="team-day${isT?' is-today':''}"${isT?' id="team'+i+'"':''}>
@@ -1299,6 +1342,8 @@ function renderTeam(){
   }
   html+='</div>';
   c.innerHTML=html;
+  c.querySelectorAll('.lg-btn[data-pf]').forEach(el=>el.onclick=()=>{const n=el.getAttribute('data-pf');if(state.teamFilter.has(n))state.teamFilter.delete(n);else state.teamFilter.add(n);renderTeam();});
+  const clr=document.getElementById('teamFilterClear');if(clr)clr.onclick=()=>{state.teamFilter.clear();renderTeam();};
   c.querySelectorAll('.trow').forEach(el=>el.onclick=()=>openAction(+el.dataset.id));
   if(scrollId){const t=document.getElementById(scrollId);if(t)setTimeout(()=>t.scrollIntoView({behavior:'auto',block:'start'}),50);}
 }
@@ -1423,6 +1468,59 @@ function openChantierDay(name,day){
   const body=document.getElementById('modalBody');body.innerHTML=html;
   body.querySelectorAll('.tmember[data-id]').forEach(el=>el.onclick=()=>openAction(+el.dataset.id));
   document.getElementById('overlay').classList.add('show');
+}
+
+/* VUE DISPONIBILITÉS : agents libres (rien) OU mobilisables (dépannage / temps réel), par jour */
+function renderDispo(){
+  const c=document.getElementById('content');
+  const mon=startOfWeek(state.cursor),fri=addDays(mon,4);
+  const lbl=mon.getMonth()===fri.getMonth()
+    ?`${mon.getDate()} – ${fri.getDate()} ${MONTHS[mon.getMonth()]} ${mon.getFullYear()}`
+    :`${mon.getDate()} ${MONTHS[mon.getMonth()]} – ${fri.getDate()} ${MONTHS[fri.getMonth()]} ${fri.getFullYear()}`;
+  document.getElementById('periodLbl').textContent='Semaine du '+lbl;
+  const reals=state.people.filter(n=>!SPECIAL.test(n));
+  const today=new Date();
+  let html='<div class="chan-wrap"><div class="dispo-legend"><span class="dl"><span class="dot" style="background:#30d158"></span>Libre (rien de prévu)</span><span class="dl"><span class="dot" style="background:#ff9f0a"></span>Mobilisable (dépannage / temps réel)</span></div>';
+  let scrollId=null;
+  for(let i=0;i<5;i++){
+    const d=addDays(mon,i);const isT=sameDay(d,today);if(isT)scrollId='dispoDay'+i;
+    const dayEntries=entriesOnDay(state.entries,d);
+    // map agent -> catégories ce jour
+    const catByAgent=new Map();
+    for(const e of dayEntries){if(SPECIAL.test(e.nom))continue;
+      if(!catByAgent.has(e.nom))catByAgent.set(e.nom,new Set());
+      catByAgent.get(e.nom).add(categorize(e));}
+    // libres = agents réels sans aucune affectation ce jour
+    const libres=reals.filter(n=>!catByAgent.has(n));
+    // mobilisables = agents en dépannage CE jour (temps réel inclus dans 'depannage')
+    const mobil=reals.filter(n=>catByAgent.has(n)&&catByAgent.get(n).has('depannage'));
+    const total=libres.length+mobil.length;
+    html+=`<div class="chan-day${isT?' is-today':''}"${isT?' id="dispoDay'+i+'"':''}>
+      <div class="chan-day-h"><span class="cdh-day">${WD_NAMES[i]}</span><span class="cdh-date">${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}</span><span class="cdh-c">${total} dispo</span></div>`;
+    if(!total){
+      html+='<div class="chan-day-empty">Aucun agent disponible ce jour</div>';
+    }else{
+      html+='<div class="dispo-body">';
+      if(libres.length){
+        html+='<div class="dispo-group"><div class="dg-h" style="color:#30d158">Libres · '+libres.length+'</div><div class="dispo-chips">';
+        for(const n of libres){const col=state.color.get(n)||'#8a93a6';
+          html+=`<span class="dispo-chip" data-name="${esc(n)}"><span class="av" style="background:${col}33;color:${col}">${initials(n)}</span>${esc(n.split(' ')[0])}</span>`;}
+        html+='</div></div>';
+      }
+      if(mobil.length){
+        html+='<div class="dispo-group"><div class="dg-h" style="color:#ff9f0a">Mobilisables (dépannage / temps réel) · '+mobil.length+'</div><div class="dispo-chips">';
+        for(const n of mobil){const col=state.color.get(n)||'#8a93a6';
+          html+=`<span class="dispo-chip mob" data-name="${esc(n)}"><span class="av" style="background:${col}33;color:${col}">${initials(n)}</span>${esc(n.split(' ')[0])}</span>`;}
+        html+='</div></div>';
+      }
+      html+='</div>';
+    }
+    html+='</div>';
+  }
+  html+='</div>';
+  c.innerHTML=html;
+  c.querySelectorAll('.dispo-chip[data-name]').forEach(el=>el.onclick=()=>{const nm=el.getAttribute('data-name');if(state.byPerson.has(nm)){state.current=nm;state.view='today';document.querySelectorAll('#viewSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v==='today'));renderPeople();renderMain();}});
+  if(scrollId){const t=document.getElementById(scrollId);if(t)setTimeout(()=>t.scrollIntoView({behavior:'auto',block:'start'}),50);}
 }
 
 /* WEEK (Mon-Fri) */
@@ -1769,11 +1867,14 @@ function renderPickerList(){
   if(!n)box.innerHTML='<div style="padding:30px;color:var(--soft);text-align:center">Aucun résultat</div>';
 }
 function selectPerson(name){
-  state.current=name;state.view='today';state.cursor=new Date();
+  const dv=lsGet('default_view')||'today';
+  const personViews=['today','week','agenda','month'];
+  const startView=personViews.includes(dv)?dv:'today';
+  state.current=name;state.view=startView;state.cursor=new Date();
   const arr=state.byPerson.get(name)||[];
   if(arr.length){const ds=arr.map(e=>e.date);const today=new Date();
     state.cursor=(today>=ds[0]&&today<=ds[ds.length-1])?today:ds[0];}
-  document.querySelectorAll('#viewSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v==='today'));
+  document.querySelectorAll('#viewSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===startView));
   hidePicker();hideSettings();setTab('plan');renderPeople();renderMain();
 }
 
@@ -1875,7 +1976,7 @@ document.getElementById('viewSeg').onclick=e=>{const b=e.target.closest('button'
 
 // recale le curseur sur aujourd'hui si la plage de données le contient, sinon sur l'affectation la plus proche
 function recenterToday(){
-  const arr=((state.view==='team'||state.view==='chantiers')?state.entries:personEntries());if(!arr.length)return;
+  const arr=((state.view==='team'||state.view==='chantiers'||state.view==='dispo')?state.entries:personEntries());if(!arr.length)return;
   const today=new Date();const ds=arr.map(e=>e.date).sort((a,b)=>a-b);
   if(today>=ds[0]&&today<=ds[ds.length-1]){state.cursor=today;return;}
   const tMid=new Date(today.getFullYear(),today.getMonth(),today.getDate());
@@ -1884,13 +1985,14 @@ function recenterToday(){
 }
 
 function step(dir){
-  if(state.view==='week'||state.view==='team'||state.view==='chantiers')state.cursor=addDays(startOfWeek(state.cursor),dir*7);
+  if(state.view==='week'||state.view==='team'||state.view==='chantiers'||state.view==='dispo')state.cursor=addDays(startOfWeek(state.cursor),dir*7);
   else if(state.view==='month')state.cursor=new Date(state.cursor.getFullYear(),state.cursor.getMonth()+dir,1);
   renderMain();
 }
 document.getElementById('prev').onclick=()=>step(-1);
 document.getElementById('next').onclick=()=>step(1);
 document.getElementById('todayBtn').onclick=()=>{recenterToday();renderMain();};
+document.getElementById('dateJump').onchange=e=>{const v=e.target.value;if(!v)return;const [y,m,d]=v.split('-').map(Number);state.cursor=new Date(y,m-1,d);renderMain();};
 document.getElementById('fabToday').onclick=()=>{if(state.view==='today'){renderMain();}else{recenterToday();renderMain();}};
 
 document.getElementById('searchTop').onclick=openSearch;
@@ -1980,13 +2082,14 @@ const VIEW_ICON={
   agenda:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
   month:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',
   team:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/>',
-  chantiers:'<path d="M2 20h20M4 20V10l5-3 5 3v10M14 20v-6l5-3v9"/>'
+  chantiers:'<path d="M2 20h20M4 20V10l5-3 5 3v10M14 20v-6l5-3v9"/>',
+  dispo:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'
 };
-const VIEW_LABEL={today:'Ma journée',week:'Semaine',agenda:'Agenda',month:'Mois',team:'Équipe',chantiers:'Chantiers'};
-const VIEW_DESC={today:'Mes interventions du jour',week:'Lundi à vendredi',agenda:'Liste chronologique',month:'Calendrier mensuel',team:'Toute l\'équipe, par couleur',chantiers:'Par chantier et par jour'};
+const VIEW_LABEL={today:'Ma journée',week:'Semaine',agenda:'Agenda',month:'Mois',team:'Équipe',chantiers:'Chantiers',dispo:'Disponibilités'};
+const VIEW_DESC={today:'Mes interventions du jour',week:'Lundi à vendredi',agenda:'Liste chronologique',month:'Calendrier mensuel',team:'Toute l\'équipe, par couleur',chantiers:'Par chantier et par jour',dispo:'Agents libres ou mobilisables'};
 function openVuePicker(){
   const box=document.getElementById('vueList');box.innerHTML='';
-  for(const v of ['today','week','agenda','month','team','chantiers']){
+  for(const v of ['today','week','agenda','month','team','chantiers','dispo']){
     const b=document.createElement('button');b.className='vue-item'+(state.view===v?' on':'');
     b.innerHTML=`<span class="vi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${VIEW_ICON[v]}</svg></span>
       <span><span class="vi-t">${VIEW_LABEL[v]}</span><span class="vi-d">${VIEW_DESC[v]}</span></span>
@@ -2144,6 +2247,7 @@ function applyTheme(t){
 }
 document.getElementById('themeSwitch').onclick=e=>{const b=e.target.closest('button');if(!b)return;lsSet('theme',b.dataset.theme);applyTheme(b.dataset.theme);};
 applyTheme(lsGet('theme')||'dark');
+(function(){const dv=document.getElementById('defaultView');if(dv){dv.value=lsGet('default_view')||'today';dv.onchange=()=>lsSet('default_view',dv.value);}})();
 
 /* écran favori */
 document.getElementById('favSearch').oninput=renderFavList;
