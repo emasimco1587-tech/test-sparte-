@@ -459,6 +459,14 @@ html[data-theme="light"] #updateToast{background:rgba(255,255,255,.9)}
 /* color list (admin) */
 .color-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto}
 .color-row{display:flex;align-items:center;gap:11px;padding:7px 8px;border-radius:11px;background:var(--glass-2);border:1px solid var(--line)}
+.hide-list{display:flex;flex-direction:column;gap:7px;max-height:340px;overflow-y:auto;margin-top:4px}
+.hide-row{display:flex;align-items:center;justify-content:space-between;gap:11px;padding:9px 12px;border-radius:11px;background:var(--glass-2);border:1px solid var(--line)}
+.hr-name{font-size:13.5px;font-weight:600;color:var(--ink)}
+.hr-name.is-hidden{color:var(--faint);text-decoration:line-through}
+.hr-toggle{width:44px;height:26px;border-radius:14px;background:var(--line-2);border:none;position:relative;cursor:pointer;flex:none;transition:background .18s}
+.hr-toggle.on{background:#ff453a}
+.hr-knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .18s}
+.hr-toggle.on .hr-knob{left:21px}
 .color-row .cr-name{flex:1;font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .color-swatch{width:34px;height:34px;border-radius:10px;border:2px solid rgba(255,255,255,.25);cursor:pointer;flex:none;position:relative;overflow:hidden}
 .color-swatch input{position:absolute;inset:-6px;opacity:0;cursor:pointer}
@@ -941,6 +949,11 @@ html[data-theme="light"] .pcount{background:rgba(20,40,80,.10);color:#566173}
         <button class="btn btn-ink" id="colorReset" style="margin-top:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Réinitialiser les couleurs</button>
       </div>
       <div class="set-card">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"/></svg>Masquer des personnes</h3>
+        <p>Les personnes masquées disparaissent <b>partout</b> dans l'application (listes, équipe, disponibilités, recherche) pour <b>toute l'équipe</b>.</p>
+        <div class="hide-list" id="hideList"></div>
+      </div>
+      <div class="set-card">
         <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0-12 4 4m-4-4-4 4M5 21h14"/></svg>Données du planning</h3>
         <p id="adminDataInfo">—</p>
         <button class="btn btn-ink" id="adminImport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0-12 4 4m-4-4-4 4M5 21h14"/></svg>Importer un export Excel / JSON</button>
@@ -1060,9 +1073,9 @@ const DOW=['dim','lun','mar','mer','jeu','ven','sam'];
 const DOW_FULL=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
 const WD_NAMES=['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
 
-const state={entries:[],byPerson:new Map(),people:[],current:null,view:'week',cursor:new Date(),q:'',team:new Map(),color:new Map(),fav:null,generated:'',srcType:''};
+const state={entries:[],byPerson:new Map(),people:[],current:null,view:'week',cursor:new Date(),q:'',team:new Map(),color:new Map(),fav:null,generated:'',srcType:'',teamFilter:new Set(),hidden:new Set(),allEntries:[]};
 const PALETTE=['#0a84ff','#ff9f0a','#30d158','#ff375f','#bf5af2','#64d2ff','#ffd60a','#ff6482','#5e5ce6','#40c8e0','#ac8e68','#32d74b','#ff6b22','#66d4cf','#da8fff','#a2845e','#ff453a','#7d7aff','#ffd426','#5ac8fa'];
-const APP_VERSION="v27";
+const APP_VERSION="v28";
 function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
@@ -1154,7 +1167,10 @@ function parse(rows){
 }
 
 /* ---------- build ---------- */
-function build(entries){
+function build(allEntries){
+  // garder la liste complète (pour pouvoir ré-afficher des personnes masquées)
+  state.allEntries=allEntries;
+  const entries=allEntries.filter(e=>!state.hidden.has(e.nom));
   entries.forEach((e,i)=>e._id=i);
   state.entries=entries;
   const map=new Map();
@@ -1177,6 +1193,27 @@ function build(entries){
   const dates=entries.map(e=>e.date).sort((a,b)=>a-b);
   const today=new Date();
   state.cursor=(dates.length&&today>=dates[0]&&today<=dates[dates.length-1])?today:(dates[0]||today);
+}
+
+/* masquage de personnes (partagé via Firebase) */
+function rebuildFromHidden(){
+  const cur=state.current, view=state.view, cursor=state.cursor;
+  build(state.allEntries||state.entries);
+  state.view=view; state.cursor=cursor;
+  if(cur&&state.byPerson.has(cur)){state.current=cur;}
+  else if(['team','chantiers','dispo'].includes(view)){/* vues collectives : pas besoin de personne */}
+  else {state.current=state.people[0]||null;}
+  renderPeople(); renderMain();
+}
+function loadHiddenFromFb(){
+  if(!fbReady)return Promise.resolve();
+  return fbGet('hidden').then(list=>{
+    state.hidden=new Set(Array.isArray(list)?list:(list&&typeof list==='object'?Object.values(list):[]));
+  }).catch(()=>{});
+}
+function saveHiddenToFb(){
+  if(!fbReady){alert('Firebase non connecté : le masquage ne sera pas partagé.');return Promise.resolve();}
+  return fbSet('hidden',[...state.hidden]).catch(err=>alert('Échec enregistrement masquage : '+err));
 }
 
 function teammates(e){
@@ -2127,7 +2164,7 @@ function requestAdmin(){
   if(code===ref){adminUnlocked=true;openAdmin();}
   else alert('Code incorrect.');
 }
-function openAdmin(){hideSettings();renderColorList();adminDataInfoFill();fillFbFields();
+function openAdmin(){hideSettings();renderColorList();renderHideList();adminDataInfoFill();fillFbFields();
   const po=document.getElementById('pwOpen'),pa=document.getElementById('pwAdmin');
   if(po)po.value=teamPassword||DEFAULT_PASSWORD;
   if(pa)pa.value=adminPassword||DEFAULT_ADMIN_PASSWORD;
@@ -2164,7 +2201,26 @@ function renderColorList(){
     box.appendChild(row);
   }
 }
-document.getElementById('colorReset').onclick=()=>{lsDel('colors');build(state.entries);applyCustomColors();renderColorList();};
+function renderHideList(){
+  const box=document.getElementById('hideList');if(!box)return;box.innerHTML='';
+  // tous les noms réels (à partir de la liste complète, masqués inclus)
+  const all=[...new Set((state.allEntries||state.entries).map(e=>e.nom))].filter(n=>!SPECIAL.test(n)).sort((a,b)=>a.localeCompare(b,'fr'));
+  if(!all.length){box.innerHTML='<p class="notif-note">Aucune personne dans le planning.</p>';return;}
+  for(const n of all){
+    const hidden=state.hidden.has(n);
+    const row=document.createElement('div');row.className='hide-row';
+    row.innerHTML=`<span class="hr-name${hidden?' is-hidden':''}">${esc(n)}</span>
+      <button class="hr-toggle${hidden?' on':''}" role="switch" aria-checked="${hidden}"><span class="hr-knob"></span></button>`;
+    row.querySelector('.hr-toggle').onclick=()=>{
+      if(state.hidden.has(n))state.hidden.delete(n);else state.hidden.add(n);
+      saveHiddenToFb();
+      renderHideList();
+      rebuildFromHidden();
+    };
+    box.appendChild(row);
+  }
+}
+document.getElementById('colorReset').onclick=()=>{lsDel('colors');build(state.allEntries||state.entries);applyCustomColors();renderColorList();renderPeople();renderMain();};
 document.getElementById('adminImport').onclick=()=>document.getElementById('file').click();
 document.getElementById('adminExport').onclick=exportForWeb;
 document.getElementById('adminPublish').onclick=publishToFirebase;
@@ -2262,7 +2318,7 @@ if('serviceWorker' in navigator){
 let teamPassword="";          // mot de passe d'ouverture (depuis Firebase, sinon défaut)
 let teamName="Planning";
 let adminPassword="";         // mot de passe administrateur (depuis Firebase, sinon défaut)
-function startApp(){ autoLoad(); }
+function startApp(){ loadHiddenFromFb().then(autoLoad).catch(autoLoad); }
 function tryUnlock(){
   const v=document.getElementById('lockInput').value;
   const ref=teamPassword||DEFAULT_PASSWORD;
