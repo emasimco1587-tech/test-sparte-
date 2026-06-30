@@ -36,6 +36,15 @@ html[data-theme="light"]{
   --sh:0 8px 28px -14px rgba(20,40,80,.4);
   --sh-glow:0 0 0 .5px rgba(20,40,80,.08),0 12px 36px -16px rgba(20,40,80,.4);
 }
+html[data-theme="aero"]{
+  --bg:#dcf0fb;--bg2:#eef8ff;--ink:#0c2742;--soft:#3f6f8c;--faint:#7099b3;
+  --line:rgba(255,255,255,.55);--line-2:rgba(255,255,255,.8);
+  --glass:rgba(255,255,255,.40);--glass-2:rgba(255,255,255,.30);--glass-hi:rgba(255,255,255,.65);
+  --blue:#0a84ff;--blue-2:#0077e6;--blue-d:#005fc4;--blue-glow:rgba(10,132,255,.4);
+  --cyan:#22c8ff;--accent:#0a84ff;
+  --sh:0 10px 30px -12px rgba(20,110,190,.35);
+  --sh-glow:0 0 0 .5px rgba(255,255,255,.5),0 14px 40px -16px rgba(20,110,190,.38);
+}
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
 html,body{height:100%;overflow-x:hidden;width:100%}
@@ -55,6 +64,42 @@ html[data-theme="light"] body{
     radial-gradient(680px 520px at -8% 8%,rgba(100,210,255,.14),transparent 56%),
     radial-gradient(720px 560px at 50% 116%,rgba(10,132,255,.12),transparent 56%),
     linear-gradient(180deg,#eef2f8,#e6ecf5);}
+html[data-theme="aero"] body{
+  background:var(--bg);
+  background-image:
+    radial-gradient(800px 600px at 6% -10%,rgba(140,220,255,.65),transparent 55%),
+    radial-gradient(760px 600px at 102% 6%,rgba(190,235,255,.6),transparent 56%),
+    radial-gradient(820px 640px at 50% 118%,rgba(120,195,255,.45),transparent 58%),
+    radial-gradient(560px 460px at 90% 96%,rgba(170,140,255,.18),transparent 60%),
+    linear-gradient(165deg,#eef9ff,#d8eefc 55%,#c7e6f6);
+  background-attachment:fixed;}
+
+/* ===== Fonds d'écran sélectionnables (remplacent le fond du thème) ===== */
+body[data-bg="aqua"]{background-image:
+    radial-gradient(820px 620px at 8% -8%,rgba(100,220,255,.45),transparent 55%),
+    radial-gradient(760px 600px at 100% 10%,rgba(64,180,255,.4),transparent 56%),
+    radial-gradient(800px 640px at 50% 115%,rgba(34,200,210,.35),transparent 58%),
+    linear-gradient(165deg,#06283f,#0a3a55 55%,#0d4a68)!important;background-attachment:fixed!important}
+body[data-bg="sunset"]{background-image:
+    radial-gradient(820px 620px at 6% -8%,rgba(255,150,90,.45),transparent 55%),
+    radial-gradient(760px 600px at 102% 8%,rgba(255,90,150,.4),transparent 56%),
+    radial-gradient(800px 640px at 50% 116%,rgba(190,80,220,.32),transparent 58%),
+    linear-gradient(165deg,#371333,#5a1a42 55%,#7a2440)!important;background-attachment:fixed!important}
+body[data-bg="forest"]{background-image:
+    radial-gradient(820px 620px at 6% -8%,rgba(110,230,160,.4),transparent 55%),
+    radial-gradient(760px 600px at 102% 8%,rgba(40,190,150,.4),transparent 56%),
+    radial-gradient(800px 640px at 50% 116%,rgba(20,140,120,.35),transparent 58%),
+    linear-gradient(165deg,#06302a,#0a4438 55%,#0d5444)!important;background-attachment:fixed!important}
+body[data-bg="lavender"]{background-image:
+    radial-gradient(820px 620px at 6% -8%,rgba(190,150,255,.42),transparent 55%),
+    radial-gradient(760px 600px at 102% 8%,rgba(255,140,210,.32),transparent 56%),
+    radial-gradient(800px 640px at 50% 116%,rgba(120,110,230,.35),transparent 58%),
+    linear-gradient(165deg,#231346,#341a5e 55%,#42206f)!important;background-attachment:fixed!important}
+body[data-bg="mono"]{background-image:
+    radial-gradient(820px 620px at 8% -8%,rgba(255,255,255,.08),transparent 55%),
+    radial-gradient(760px 600px at 100% 10%,rgba(255,255,255,.05),transparent 56%),
+    linear-gradient(165deg,#10141c,#161b24 55%,#1b2029)!important;background-attachment:fixed!important}
+
 .serif{font-family:'Fraunces',serif}
 .mono{font-family:'IBM Plex Mono',monospace}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
@@ -293,8 +338,19 @@ html[data-icon-size="lg"] .wcard .cat-badge svg{width:16px;height:16px}
 .set-card h3 svg{width:18px;height:18px;color:var(--blue-2)}
 .set-card p{font-size:13px;color:var(--soft);line-height:1.55;margin-bottom:13px}
 .set-card .btn{width:100%;justify-content:center;padding:13px;font-size:14.5px}
-.theme-switch{display:flex;gap:8px;background:var(--glass-2);border:1px solid var(--line);border-radius:13px;padding:4px}
-.theme-switch button{flex:1;padding:11px;border-radius:10px;font-weight:600;font-size:14px;color:var(--soft);transition:.14s}
+.theme-switch{display:flex;gap:6px;background:var(--glass-2);border:1px solid var(--line);border-radius:13px;padding:4px}
+.theme-switch button{flex:1;padding:10px 4px;border-radius:10px;font-weight:600;font-size:12.5px;color:var(--soft);transition:.14s;white-space:nowrap}
+.bg-picker{display:flex;gap:9px;flex-wrap:wrap;margin-top:8px}
+.bg-swatch{width:48px;height:48px;border-radius:14px;flex:none;border:2px solid var(--line);position:relative;overflow:hidden;transition:.14s;display:grid;place-items:center}
+.bg-swatch.on{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+.bg-swatch:active{transform:scale(.93)}
+.bg-default{background:linear-gradient(135deg,var(--bg),var(--bg2))}
+.bg-default span{font-size:8px;font-weight:800;color:var(--soft);text-align:center;line-height:1.2}
+.bg-aqua{background:radial-gradient(circle at 30% 20%,#64dcff,transparent 60%),radial-gradient(circle at 80% 80%,#0d4a68,transparent 60%),linear-gradient(165deg,#06283f,#0d4a68)}
+.bg-sunset{background:radial-gradient(circle at 30% 20%,#ff966a,transparent 60%),radial-gradient(circle at 80% 80%,#7a2440,transparent 60%),linear-gradient(165deg,#371333,#7a2440)}
+.bg-forest{background:radial-gradient(circle at 30% 20%,#6ee6a0,transparent 60%),radial-gradient(circle at 80% 80%,#0d5444,transparent 60%),linear-gradient(165deg,#06302a,#0d5444)}
+.bg-lavender{background:radial-gradient(circle at 30% 20%,#be96ff,transparent 60%),radial-gradient(circle at 80% 80%,#42206f,transparent 60%),linear-gradient(165deg,#231346,#42206f)}
+.bg-mono{background:radial-gradient(circle at 30% 20%,#3a4150,transparent 60%),linear-gradient(165deg,#10141c,#1b2029)}
 .theme-switch button.on{background:linear-gradient(145deg,var(--blue),var(--blue-d));color:#fff;box-shadow:0 0 14px -6px var(--blue-glow)}
 .set-steps{counter-reset:s;list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:4px}
 .set-steps li{position:relative;padding-left:32px;font-size:13px;color:var(--soft);line-height:1.5}
@@ -647,6 +703,51 @@ html[data-theme="light"] .theme-switch{background:#dbe3ef}
 html[data-theme="light"] .theme-switch button{color:#3a4658}
 html[data-theme="light"] .person:hover{background:#dde5f0}
 html[data-theme="light"] .pcount{background:rgba(20,40,80,.10);color:#566173}
+/* affinage thème Aéroglasse : reflet de surface plus marqué (effet bulle d'eau) */
+html[data-theme="aero"] .glass-card::after,
+html[data-theme="aero"] .card::after,
+html[data-theme="aero"] .wcol::after,
+html[data-theme="aero"] .team-day::after,
+html[data-theme="aero"] .modal::after{background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,0));opacity:1}
+html[data-theme="aero"] .glass-card,html[data-theme="aero"] .today-hero,html[data-theme="aero"] .today-card,html[data-theme="aero"] .today-empty,
+html[data-theme="aero"] .card,html[data-theme="aero"] .wcol,html[data-theme="aero"] .team-day,html[data-theme="aero"] .chan-day,html[data-theme="aero"] .set-card,
+html[data-theme="aero"] .modal,html[data-theme="aero"] .lock-card,html[data-theme="aero"] .pick-item{
+  backdrop-filter:blur(38px) saturate(2.1) brightness(1.22);-webkit-backdrop-filter:blur(38px) saturate(2.1) brightness(1.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),var(--sh-glow)}
+html[data-theme="aero"] header,html[data-theme="aero"] aside,html[data-theme="aero"] .toolbar,html[data-theme="aero"] #bottomNav{
+  backdrop-filter:blur(40px) saturate(2) brightness(1.2);-webkit-backdrop-filter:blur(40px) saturate(2) brightness(1.2)}
+html[data-theme="aero"] header{background:rgba(255,255,255,.45);border-bottom-color:rgba(255,255,255,.6)}
+html[data-theme="aero"] aside{background:rgba(255,255,255,.32);border-right-color:rgba(255,255,255,.5)}
+html[data-theme="aero"] .toolbar{background:rgba(255,255,255,.42)}
+html[data-theme="aero"] #bottomNav{background:rgba(255,255,255,.55);border-top-color:rgba(255,255,255,.6)}
+html[data-theme="aero"] .tag{background:rgba(10,132,255,.14);color:#0060df}
+html[data-theme="aero"] .team-pill{background:rgba(10,132,255,.14);color:#0060df}
+html[data-theme="aero"] .multi-badge{color:#0060df}
+html[data-theme="aero"] .av{background:rgba(10,132,255,.16);color:#0060df}
+html[data-theme="aero"] .seg button.on,
+html[data-theme="aero"] .person.active,
+html[data-theme="aero"] .today-btn,
+html[data-theme="aero"] #bottomNav .tab.on .tab-ic{color:#fff}
+html[data-theme="aero"] .modal{background:rgba(255,255,255,.55)}
+html[data-theme="aero"] #picker,html[data-theme="aero"] #settings,html[data-theme="aero"] #fav,html[data-theme="aero"] #admin{background:rgba(225,243,253,.6)}
+html[data-theme="aero"] #lock{background:rgba(220,240,251,.5)}
+html[data-theme="aero"] #lockErr{color:#c81e3a}
+html[data-theme="aero"] .ev,html[data-theme="aero"] .trow .tlabel{color:#fff}
+html[data-theme="aero"] .seg{background:rgba(255,255,255,.4);border-color:rgba(255,255,255,.6)}
+html[data-theme="aero"] .seg button{color:#3f6f8c}
+html[data-theme="aero"] .seg button.on{background:linear-gradient(145deg,#23c8ff,#0a84ff);color:#fff;box-shadow:0 2px 10px -2px rgba(10,132,255,.5),inset 0 1px 0 rgba(255,255,255,.5)}
+html[data-theme="aero"] .nav{background:rgba(255,255,255,.4);border-color:rgba(255,255,255,.6)}
+html[data-theme="aero"] .nav button{color:#0c2742;background:rgba(255,255,255,.5)}
+html[data-theme="aero"] .nav button:hover{background:#fff}
+html[data-theme="aero"] .nav .lbl{color:#3f6f8c}
+html[data-theme="aero"] #bottomNav .tab{color:#3f6f8c}
+html[data-theme="aero"] #bottomNav .tab.on{color:#0060df}
+html[data-theme="aero"] .theme-switch{background:rgba(255,255,255,.4)}
+html[data-theme="aero"] .theme-switch button{color:#3f6f8c}
+html[data-theme="aero"] .person:hover{background:rgba(255,255,255,.45)}
+html[data-theme="aero"] .pcount{background:rgba(10,132,255,.10);color:#3f6f8c}
+html[data-theme="aero"] .today-btn,html[data-theme="aero"] .btn-blue{background:linear-gradient(145deg,#3fd4ff,#0a84ff)!important;box-shadow:0 0 18px -4px rgba(10,132,255,.5),inset 0 1px 0 rgba(255,255,255,.6)!important}
+html[data-theme="aero"] #fabToday{background:linear-gradient(145deg,#3fd4ff,#0a84ff);box-shadow:0 6px 20px -6px rgba(10,132,255,.55),inset 0 1px 0 rgba(255,255,255,.6)}
 .glass-card,.card,.wcol,.team-day,.set-card,.modal,.lock-card,.pick-item{position:relative}
 .glass-card::after,.card::after,.wcol::after,.team-day::after,.modal::after{content:"";position:absolute;left:0;right:0;top:0;height:42%;
   background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,0));pointer-events:none;border-radius:inherit;opacity:.7}
@@ -860,6 +961,16 @@ html[data-theme="light"] .pcount{background:rgba(20,40,80,.10);color:#566173}
         <div class="theme-switch" id="themeSwitch">
           <button data-theme="dark" class="on">🌙 Sombre</button>
           <button data-theme="light">☀️ Clair</button>
+          <button data-theme="aero">💧 Aéroglasse</button>
+        </div>
+        <p style="margin-top:14px">Fond d'écran :</p>
+        <div class="bg-picker" id="bgPicker">
+          <button class="bg-swatch bg-default on" data-bg="default" title="Défaut (suit le thème)"><span>Défaut</span></button>
+          <button class="bg-swatch bg-aqua" data-bg="aqua" title="Bulles d'eau"></button>
+          <button class="bg-swatch bg-sunset" data-bg="sunset" title="Coucher de soleil"></button>
+          <button class="bg-swatch bg-forest" data-bg="forest" title="Forêt"></button>
+          <button class="bg-swatch bg-lavender" data-bg="lavender" title="Lavande"></button>
+          <button class="bg-swatch bg-mono" data-bg="mono" title="Minimal"></button>
         </div>
         <p style="margin-top:14px">Vue affichée à l'ouverture :</p>
         <select id="defaultView" class="ts-input" style="margin-top:6px">
@@ -1119,7 +1230,7 @@ const WD_NAMES=['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
 
 const state={entries:[],byPerson:new Map(),people:[],current:null,view:'week',cursor:new Date(),q:'',team:new Map(),color:new Map(),fav:null,generated:'',srcType:'',teamFilter:new Set(),hidden:new Set(),allEntries:[],catIcons:{},catColors:{},iconSize:'md'};
 const PALETTE=['#0a84ff','#ff9f0a','#30d158','#ff375f','#bf5af2','#64d2ff','#ffd60a','#ff6482','#5e5ce6','#40c8e0','#ac8e68','#32d74b','#ff6b22','#66d4cf','#da8fff','#a2845e','#ff453a','#7d7aff','#ffd426','#5ac8fa'];
-const APP_VERSION="v32";
+const APP_VERSION="v33";
 function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
@@ -2453,12 +2564,20 @@ document.getElementById('cfgFile').onchange=e=>{const f=e.target.files[0];if(!f)
 /* thème clair / sombre */
 function applyTheme(t){
   const html=document.documentElement;
-  if(t==='light')html.setAttribute('data-theme','light');else html.removeAttribute('data-theme');
-  const mc=document.querySelector('meta[name="theme-color"]');if(mc)mc.setAttribute('content',t==='light'?'#eef2f8':'#000308');
+  if(t==='light'||t==='aero')html.setAttribute('data-theme',t);else html.removeAttribute('data-theme');
+  const mc=document.querySelector('meta[name="theme-color"]');
+  if(mc)mc.setAttribute('content',t==='light'?'#eef2f8':t==='aero'?'#dcf0fb':'#000308');
   document.querySelectorAll('#themeSwitch button').forEach(b=>b.classList.toggle('on',b.dataset.theme===t));
 }
 document.getElementById('themeSwitch').onclick=e=>{const b=e.target.closest('button');if(!b)return;lsSet('theme',b.dataset.theme);applyTheme(b.dataset.theme);};
 applyTheme(lsGet('theme')||'dark');
+function applyBgPreset(p){
+  const v=p&&p!=='default'?p:'';
+  if(v)document.body.setAttribute('data-bg',v);else document.body.removeAttribute('data-bg');
+  document.querySelectorAll('#bgPicker .bg-swatch').forEach(b=>b.classList.toggle('on',b.dataset.bg===(v||'default')));
+}
+document.getElementById('bgPicker').onclick=e=>{const b=e.target.closest('button');if(!b)return;lsSet('bg_preset',b.dataset.bg);applyBgPreset(b.dataset.bg);};
+applyBgPreset(lsGet('bg_preset')||'default');
 (function(){const dv=document.getElementById('defaultView');if(dv){dv.value=lsGet('default_view')||'today';dv.onchange=()=>lsSet('default_view',dv.value);}})();
 
 /* écran favori */
