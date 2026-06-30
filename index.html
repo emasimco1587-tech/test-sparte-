@@ -1075,7 +1075,7 @@ const WD_NAMES=['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
 
 const state={entries:[],byPerson:new Map(),people:[],current:null,view:'week',cursor:new Date(),q:'',team:new Map(),color:new Map(),fav:null,generated:'',srcType:'',teamFilter:new Set(),hidden:new Set(),allEntries:[]};
 const PALETTE=['#0a84ff','#ff9f0a','#30d158','#ff375f','#bf5af2','#64d2ff','#ffd60a','#ff6482','#5e5ce6','#40c8e0','#ac8e68','#32d74b','#ff6b22','#66d4cf','#da8fff','#a2845e','#ff453a','#7d7aff','#ffd426','#5ac8fa'];
-const APP_VERSION="v28";
+const APP_VERSION="v29";
 function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
@@ -1279,6 +1279,12 @@ function renderMain(){
     return;
   }
   if(change)change.style.visibility='visible';
+  if(!state.current){
+    // ne jamais laisser l'écran vide en réclamant une re-sélection : reprendre le favori, sinon la 1re personne.
+    const fav=lsGet('fav_person');
+    if(fav&&state.byPerson.has(fav))state.current=fav;
+    else if(state.people.length)state.current=state.people[0];
+  }
   if(!state.current){document.getElementById('content').innerHTML='';return;}
   const all=personEntries();
   document.getElementById('whoName').textContent=state.current;
@@ -1613,9 +1619,10 @@ function renderAgenda(){
   const byMonth=new Map();
   for(const o of occ){const k=o.day.getFullYear()*12+o.day.getMonth();if(!byMonth.has(k))byMonth.set(k,[]);byMonth.get(k).push(o);}
   const today=new Date();const todayMid=dayStart(today);
+  const cursorMid=dayStart(state.cursor);
   let html='';let exactTodayId=null;
   let nearest=null,nearestDiff=Infinity;
-  for(const o of occ){const diff=Math.abs(o.day-todayMid);if(diff<nearestDiff){nearestDiff=diff;nearest=dKey(o.day);}}
+  for(const o of occ){const diff=Math.abs(o.day-cursorMid);if(diff<nearestDiff){nearestDiff=diff;nearest=dKey(o.day);}}
   for(const[mk,list]of byMonth){
     const y=Math.floor(mk/12),mo=mk%12;
     html+=`<div class="month-h"><h3>${MONTHS[mo]} ${y}</h3><div class="ln"></div><span class="cnt">${list.length} entrée${list.length>1?'s':''}</span></div>`;
@@ -1630,7 +1637,7 @@ function renderAgenda(){
   }
   c.innerHTML=html;
   c.querySelectorAll('.card').forEach(el=>el.onclick=()=>openAction(+el.dataset.id));
-  const targetId=exactTodayId||(nearest?'d'+nearest:null);
+  const targetId=nearest?'d'+nearest:exactTodayId;
   if(targetId){const t=document.getElementById(targetId);if(t)setTimeout(()=>t.scrollIntoView({behavior:'auto',block:'center'}),50);}
 }
 
@@ -2022,7 +2029,7 @@ function recenterToday(){
 }
 
 function step(dir){
-  if(state.view==='week'||state.view==='team'||state.view==='chantiers'||state.view==='dispo')state.cursor=addDays(startOfWeek(state.cursor),dir*7);
+  if(state.view==='week'||state.view==='team'||state.view==='chantiers'||state.view==='dispo'||state.view==='agenda')state.cursor=addDays(startOfWeek(state.cursor),dir*7);
   else if(state.view==='month')state.cursor=new Date(state.cursor.getFullYear(),state.cursor.getMonth()+dir,1);
   renderMain();
 }
@@ -2073,18 +2080,7 @@ tickClock();setInterval(tickClock,1000);
   }
 })();
 
-/* glisser horizontalement pour changer de semaine (vues semaine / équipe) */
-(function(){
-  const el=document.getElementById('content');let x0=null,y0=null,t0=0;
-  el.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;x0=e.touches[0].clientX;y0=e.touches[0].clientY;t0=Date.now();},{passive:true});
-  el.addEventListener('touchend',e=>{
-    if(x0===null)return;const t=e.changedTouches[0];const dx=t.clientX-x0,dy=t.clientY-y0;x0=null;
-    if(state.view!=='week'&&state.view!=='team'&&state.view!=='chantiers')return;
-    if(Date.now()-t0>600)return;
-    if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.6)return; // surtout horizontal
-    step(dx<0?1:-1);
-  },{passive:true});
-})();
+/* La navigation entre semaines se fait via les flèches ‹ › de la barre de période (plus fiable que le balayage). */
 
 document.getElementById('settingsTop').onclick=showSettings;
 document.getElementById('changeBtn').onclick=showPicker;
@@ -2181,7 +2177,7 @@ function fillFbFields(){
 function closeAdmin(){document.getElementById('admin').classList.remove('show');}
 function adminDataInfoFill(){const el=document.getElementById('adminDataInfo');if(el)el.innerHTML=state.generated?`Dernière mise à jour : <b>${esc(state.generated)}</b> ${state.srcType?'('+state.srcType+')':''} · ${state.entries.length} affectations`:'Aucune donnée chargée.';}
 document.getElementById('setAdmin').onclick=requestAdmin;
-document.getElementById('setLock').onclick=()=>{lsDel('unlocked');location.reload();};
+document.getElementById('setLock').onclick=()=>{lsDel('unlocked');lsDel('unlocked_pw');location.reload();};
 document.getElementById('adminClose').onclick=()=>{closeAdmin();goPlanning();};
 document.getElementById('adminBack').onclick=()=>{closeAdmin();showSettings();};
 document.getElementById('adminQuit').onclick=()=>{closeAdmin();goPlanning();};
@@ -2322,7 +2318,7 @@ function startApp(){ loadHiddenFromFb().then(autoLoad).catch(autoLoad); }
 function tryUnlock(){
   const v=document.getElementById('lockInput').value;
   const ref=teamPassword||DEFAULT_PASSWORD;
-  if(v&&v===ref){lsSet('unlocked','1');document.getElementById('lock').classList.remove('show');startApp();}
+  if(v&&v===ref){lsSet('unlocked','1');lsSet('unlocked_pw',v);document.getElementById('lock').classList.remove('show');startApp();}
   else{const er=document.getElementById('lockErr');er.textContent='Code incorrect.';document.getElementById('lockInput').value='';
     const card=document.querySelector('#lock .lock-card');card.animate([{transform:'translateX(0)'},{transform:'translateX(-7px)'},{transform:'translateX(7px)'},{transform:'translateX(0)'}],{duration:240});}
 }
@@ -2335,11 +2331,11 @@ function fbGet(path){ return fbReady ? fbDB.ref(path).get().then(s=>s.exists()?s
 function fbSet(path,val){ return fbReady ? fbDB.ref(path).set(val) : Promise.reject('Firebase non connecté'); }
 
 function bootWithTeam(){
-  // Afficher le verrou TOUT DE SUITE (sauf si déjà déverrouillé sur cet appareil),
-  // puis résoudre les mots de passe en arrière-plan.
+  // Afficher le verrou TOUT DE SUITE (sauf si déjà déverrouillé sur cet appareil AVEC le bon code),
+  // puis résoudre les mots de passe réels en arrière-plan et re-vérifier.
   teamPassword=DEFAULT_PASSWORD; adminPassword=DEFAULT_ADMIN_PASSWORD; teamName='Planning';
-  if(lsGet('unlocked')==='1'){ startApp(); }
-  else { showLockNow(); }
+  const optimistic=(lsGet('unlocked')==='1'&&lsGet('unlocked_pw'));
+  if(optimistic){ startApp(); } else { showLockNow(); }
   if(fbReady){
     fbGet('config').then(cfg=>{
       if(cfg && (cfg.openPass||cfg.adminPass)){
@@ -2350,6 +2346,11 @@ function bootWithTeam(){
         fbSet('config',{openPass:DEFAULT_PASSWORD,adminPass:DEFAULT_ADMIN_PASSWORD,teamName:'Planning'}).catch(()=>{});
       }
       document.getElementById('lockTeam').textContent=teamName||'Planning';
+      // re-vérification : si le code mémorisé sur cet appareil ne correspond plus au code réel, re-verrouiller.
+      if(optimistic && lsGet('unlocked_pw')!==teamPassword){
+        lsDel('unlocked');lsDel('unlocked_pw');
+        showLockNow();
+      }
     }).catch(()=>{});
   }
 }
